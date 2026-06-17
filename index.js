@@ -46,7 +46,7 @@ app.post('/chat', async (req, res) => {
     }));
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -59,11 +59,16 @@ app.post('/chat', async (req, res) => {
     );
 
     const data = await response.json();
-    if (data.error) return res.status(500).json({ error: data.error.message });
+    console.log('Gemini response status:', response.status);
+    if (data.error) {
+      console.log('Gemini error:', JSON.stringify(data.error));
+      return res.status(500).json({ error: data.error.message });
+    }
 
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     res.json({ reply: text });
   } catch (err) {
+    console.log('Fetch error:', err.message);
     res.status(500).json({ error: 'Failed to reach AI' });
   }
 });
